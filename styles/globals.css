@@ -13,13 +13,13 @@ body {
   box-sizing: border-box;
 }
 
-html {
+/* html {
   color-scheme: dark;
-}
+} */
 
 body {
-  color: #ffffff;
-  background: #191c1f;
+  color: black;
+  background: white;
   --color-primary: #fada3f;
   --color-secondary: #ff2136;
   --color-tertiary: #0294fe;
@@ -27,6 +27,13 @@ body {
   --card-background: #252133;
   --highlighted-background: #202326;
   font-weight: 400;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #ffffff;
+    background: #191c1f;
+  }
 }
 
 h1 {
