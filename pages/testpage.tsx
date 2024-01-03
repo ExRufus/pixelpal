@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SearchIcon from "../components/icons/SearchIcon";
 import StarIcon from "../components/icons/StarIcon";
+import ChevronDownIcon from "../components/icons/ChevronDownIcon";
 // bg-[#9A9CE9]
 export default function TestPage() {
   const [dropdown, setDropdown] = useState<"hidden" | "shown">("hidden");
@@ -23,29 +24,59 @@ export default function TestPage() {
 
         {/* Button collections */}
         <div className="flex flex-row items-center gap-4">
-          <button>Chat</button>
-          <button>Notification</button>
-          <button>Orders</button>
-          <button className="relative" onClick={() => setDropdown("shown")}>
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="w-10 h-10 rounded-full"
-                src="/images/girl_avatar.png"
-                alt="avatar"
-              />
-              <p>0x23.....28</p>
-              <p>10.00 ETH</p>
-            </div>
-            <div className="hidden absolute">
-              <ul>
-                <li>Profile</li>
-                <li>Sell Arts</li>
-                <li>Settings</li>
-                <li>Logout</li>
+          <button className="hover:bg-violet-500 px-3 py-1 rounded-lg transition">
+            Chat
+          </button>
+          <button className="hover:bg-violet-500 px-3 py-1 rounded-lg transition">
+            Notification
+          </button>
+          <button className="hover:bg-violet-500 px-3 py-1 rounded-lg transition">
+            Orders
+          </button>
+          <div className="relative">
+            <button
+              className="hover:bg-violet-500 px-3 py-1 rounded-lg transition"
+              onClick={() =>
+                setDropdown((p) => (p === "hidden" ? "shown" : "hidden"))
+              }
+            >
+              <div className="flex items-center gap-1">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="w-10 h-10 rounded-full"
+                  src="/images/girl_avatar.png"
+                  alt="avatar"
+                />
+                <div>
+                  <p className="text-xs">0x23.....28</p>
+                  <p className="text-xs">10.00 ETH</p>
+                </div>
+                <ChevronDownIcon />
+              </div>
+            </button>
+
+            {/* Dropdown */}
+            <div
+              className={`absolute w-60 right-0 top-12 bg-sky-300 rounded-lg p-4 ${
+                dropdown === "shown" ? "block" : "hidden"
+              } `}
+            >
+              <ul className="flex flex-col gap-1">
+                <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
+                  Profile
+                </li>
+                <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
+                  Sell Arts
+                </li>
+                <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
+                  Settings
+                </li>
+                <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
+                  Logout
+                </li>
               </ul>
             </div>
-          </button>
+          </div>
         </div>
       </nav>
 
