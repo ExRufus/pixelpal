@@ -13,11 +13,12 @@ contract ArtCommissionContract {
     bool public isCancelled;
     bool public isCompleted;
     uint256 public escrowBalance;
+    string public ipfsHash;
 
     // Event to log key contract actions
     event CommissionAction(address indexed initiator, string action, uint256 timestamp);
 
-    // Modifier to ensure that only the artist, client, or service provider can call specific functions
+    // Modifier to ensure that only authorized account can call specific functions
     modifier onlyParties() {
         require(msg.sender == artist || msg.sender == client || msg.sender == serviceProvider, "Not authorized");
         _;
@@ -40,7 +41,8 @@ contract ArtCommissionContract {
         address payable _serviceProvider,
         uint256 _totalCost,
         uint256 _deadline,
-        string memory _artworkDetails
+        string memory _artworkDetails,
+        string memory _ipfsHash
     ) {
         artist = _artist;
         client = _client;
@@ -52,6 +54,7 @@ contract ArtCommissionContract {
         isCancelled = false;
         isCompleted = false;
         escrowBalance = 0;
+        ipfsHash = _ipfsHash;
 
         emit CommissionAction(msg.sender, "Contract initiated", block.timestamp);
     }
@@ -72,15 +75,19 @@ contract ArtCommissionContract {
         emit CommissionAction(msg.sender, "Full payment received to escrow with fee deduction", block.timestamp);
     }
 
-    // (NOT DONE YET) Function for the artist to submit the completed artwork
-    function submitArtwork() external onlyArtist {
+    // Function for the artist to submit the completed artwork
+    function submitArtwork(string memory _ipfsHash) external onlyArtist {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
-        // Perform artwork submission logic
+
+        // Store the IPFS hash
+        ipfsHash = _ipfsHash;
+
         isCompleted = true;
+
         emit CommissionAction(msg.sender, "Artwork submitted", block.timestamp);
     }
 
-    // (NOT DONE YET) Function for the client to approve the artwork
+    // Function for the client to approve the artwork
     function approveArtwork() external onlyClient {
         require(isCompleted && !isCancelled, "Artwork is not completed or contract is cancelled");
         // Perform artwork approval logic
