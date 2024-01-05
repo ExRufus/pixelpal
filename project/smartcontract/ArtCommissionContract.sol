@@ -7,13 +7,18 @@ contract ArtCommissionContract {
     address payable public client;
     address payable public serviceProvider;
     uint256 public totalCost;
+    uint256 public escrowBalance;
     uint256 public deadline;
+    uint256 public revisionCount;
+    uint256 public maxRevisions = 3;
     string public artworkDetails;
+    string public revisionDetails;
+    string public ipfsHash;
+    string[] public ipfsHashHistory;
     bool public isApproved;
     bool public isCancelled;
     bool public isCompleted;
-    uint256 public escrowBalance;
-    string public ipfsHash;
+    bool public revisionRequested;
 
     // Event to log key contract actions
     event CommissionAction(address indexed initiator, string action, uint256 timestamp);
@@ -55,6 +60,7 @@ contract ArtCommissionContract {
         isCompleted = false;
         escrowBalance = 0;
         ipfsHash = _ipfsHash;
+        ipfsHashHistory.push("");
 
         emit CommissionAction(msg.sender, "Contract initiated", block.timestamp);
     }
@@ -112,6 +118,38 @@ contract ArtCommissionContract {
         escrowBalance = 0;
         isCancelled = true;
         emit CommissionAction(msg.sender, "Contract cancelled, partial refund provided", block.timestamp);
+    }
+
+    // Function for the client to request a revision
+    function requestRevision(string memory _revisionDetails) external onlyClient {
+        require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
+        require(!revisionRequested, "Artist is still working on the revised artwork");
+        require(revisionCount < maxRevisions, "Maximum number of revisions reached");
+
+        revisionDetails = _revisionDetails;
+        revisionRequested = true;
+        revisionCount++;
+
+        emit CommissionAction(msg.sender, "Revision requested", block.timestamp);
+    }
+
+    // Function for the artist to submit a revised version of the artwork
+    function submitRevisedArtwork(string memory _ipfsHash) external onlyArtist {
+        require(revisionRequested, "No revision requested");
+        require(msg.sender == artist, "Only the artist can submit a revised artwork");
+
+        // Save the current IPFS hash to the history
+        ipfsHashHistory.push(ipfsHash);
+
+        ipfsHash = _ipfsHash;
+        revisionRequested = false;
+
+        uint256 commissionFee = (escrowBalance * 10) / 100;
+        serviceProvider.transfer(commissionFee);
+
+        artist.transfer(escrowBalance - commissionFee);
+
+        emit CommissionAction(msg.sender, "Revised artwork submitted and payment released", block.timestamp);
     }
 
     // Function to check the contract status
