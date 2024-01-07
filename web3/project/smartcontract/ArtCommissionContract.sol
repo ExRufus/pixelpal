@@ -55,7 +55,6 @@ contract ArtCommissionContract {
         address payable _serviceProvider,
         uint256 _totalCost,
         uint256 _maxRevisions,
-        string memory _ipfsHash,
         Milestone[] memory _milestones
     ) {
         artist = _artist;
@@ -67,7 +66,6 @@ contract ArtCommissionContract {
         isCancelled = false;
         isCompleted = false;
         escrowBalance = 0;
-        ipfsHash = _ipfsHash;
 
         for (uint256 i = 0; i < _milestones.length; i++) {
             milestones.push(Milestone(_milestones[i].name, _milestones[i].fundPercentage, 0, false));
@@ -145,7 +143,7 @@ contract ArtCommissionContract {
         Milestone storage currentMilestone = milestones[milestoneCount];
 
         // Refund the payment to the client
-        uint256 refundAmount = escrowBalance * currentMilestone.fundPercentage / 100;
+        uint256 refundAmount = escrowBalance * (100 - currentMilestone.fundPercentage) / 100;
         client.transfer(refundAmount);
         
         // Pay the payment to the artist
