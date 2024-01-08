@@ -56,9 +56,9 @@ contract artCommissionContract {
         client = _client;
     }
 
-    function setServiceProviderAddress(address payable _serviceProvider) external onlyParties {
-        require(serviceProvider == address(0), "Service provider address already set");
-        serviceProvider = _serviceProvider;
+    function setArtistAddress(address payable _artist) external onlyParties {
+        require(artist == address(0), "Service provider address already set");
+        artist = _artist;
     }
 
     function setTotalCost(uint256 _totalCost) external onlyArtist {
