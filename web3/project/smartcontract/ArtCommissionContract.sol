@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 contract ArtCommissionContract {
     address payable public artist;
     address payable public client;
@@ -16,6 +18,7 @@ contract ArtCommissionContract {
     bool public isCompleted;
     bool public artFinished;
     bool public revisionRequested;
+    IERC20 public token; // ERC-20 token contract
 
     // Event to log key contract actions
     event CommissionAction(address indexed initiator, string action, uint256 timestamp);
@@ -42,7 +45,8 @@ contract ArtCommissionContract {
         address payable _client,
         address payable _serviceProvider,
         uint256 _totalCost,
-        uint256 _maxRevisions
+        uint256 _maxRevisions,
+        address _tokenAddress // ERC-20 token address
     ) {
         artist = _artist;
         client = _client;
@@ -53,6 +57,7 @@ contract ArtCommissionContract {
         isCompleted = false;
         artFinished = false;
         escrowBalance = 0;
+        token = IERC20(_tokenAddress); // Initialize ERC-20 token contract
 
         emit CommissionAction(msg.sender, "Contract initiated", block.timestamp);
     }
@@ -61,7 +66,8 @@ contract ArtCommissionContract {
     function makeFullPayment() external payable onlyClient {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
 
-        require(msg.value == totalCost * 105 / 100, "Incorrect payment amount");
+        // Use ERC-20 transferFrom function to receive payment
+        require(token.transferFrom(client, address(this), totalCost * 105 / 100), "Transfer failed");
 
         // Deduct 5% fee and send it to the service provider
         uint256 serviceFee = (msg.value * 5) / 105;
