@@ -8,26 +8,14 @@ contract ArtCommissionContract {
     address payable public serviceProvider;
     uint256 public totalCost;
     uint256 public escrowBalance;
+    uint256 public revisionCount;
     uint256 public maxRevisions;
-    uint256 public milestoneCount;
     string public ipfsHash;
-    IpfsHashHistory[] public ipfsHashHistory;
-    string[] ipfsHashes;
+    string[] public ipfsHashHistory;
     bool public isCancelled;
     bool public isCompleted;
-    Milestone[] public milestones;
-
-    struct IpfsHashHistory {
-        string lastIpfsHash;
-        string[] ipfsHashes;
-    }
-
-    struct Milestone {
-        string name;
-        uint8 fundPercentage;
-        uint256 revisionCount;
-        bool isCompleted;
-    }
+    bool public artFinished;
+    bool public revisionRequested;
 
     // Event to log key contract actions
     event CommissionAction(address indexed initiator, string action, uint256 timestamp);
@@ -39,12 +27,12 @@ contract ArtCommissionContract {
     }
 
     modifier onlyArtist() {
-        require(msg.sender == artist, "Not authorized");
+        require(msg.sender == artist, "Only artist is authorized");
         _;
     }
 
     modifier onlyClient() {
-        require(msg.sender == client, "Not authorized");
+        require(msg.sender == client, "Only client is authorized");
         _;
     }
 
@@ -54,22 +42,17 @@ contract ArtCommissionContract {
         address payable _client,
         address payable _serviceProvider,
         uint256 _totalCost,
-        uint256 _maxRevisions,
-        Milestone[] memory _milestones
+        uint256 _maxRevisions
     ) {
         artist = _artist;
         client = _client;
         serviceProvider = _serviceProvider;
         totalCost = _totalCost;
         maxRevisions = _maxRevisions;
-        milestoneCount = 0;
         isCancelled = false;
         isCompleted = false;
+        artFinished = false;
         escrowBalance = 0;
-
-        for (uint256 i = 0; i < _milestones.length; i++) {
-            milestones.push(Milestone(_milestones[i].name, _milestones[i].fundPercentage, 0, false));
-        }
 
         emit CommissionAction(msg.sender, "Contract initiated", block.timestamp);
     }
@@ -77,13 +60,14 @@ contract ArtCommissionContract {
     // Function for the client to make full payment to escrow with fee deduction
     function makeFullPayment() external payable onlyClient {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
+
         require(msg.value == totalCost * 105 / 100, "Incorrect payment amount");
 
         // Deduct 5% fee and send it to the service provider
         uint256 serviceFee = (msg.value * 5) / 105;
         serviceProvider.transfer(serviceFee);
 
-        // Deposit the remaining to the escrow
+        // Deposit the remaining 95% to the escrow
         escrowBalance += msg.value - serviceFee;
 
         emit CommissionAction(msg.sender, "Full payment received to escrow with fee deduction", block.timestamp);
@@ -93,98 +77,69 @@ contract ArtCommissionContract {
     function submitArtwork(string memory _ipfsHash) external onlyArtist {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
 
-        // Store the last IPFS hash
+        // Store the IPFS hash
+        ipfsHashHistory.push(ipfsHash);
         ipfsHash = _ipfsHash;
 
-        // Find the current milestone
-        Milestone storage currentMilestone = milestones[milestoneCount];
-
-        // Check if the milestone is not already completed
-        require(!currentMilestone.isCompleted, "Milestone already completed");
-
-        // Store the IPFS hash
-        delete ipfsHashes;
-        ipfsHashes.push(_ipfsHash);
-        ipfsHashHistory.push(IpfsHashHistory(_ipfsHash, ipfsHashes));
+        artFinished = true;
 
         emit CommissionAction(msg.sender, "Artwork submitted", block.timestamp);
     }
 
-    // Function for the client to approve artwork on each milestone
-    function approveMilestone() external payable onlyClient {
+    // Function for the client to approve the artwork
+    function approveArtwork() external onlyClient {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
+        require(artFinished, "Artist is still working on the revised artwork");
 
-        // Find the current milestone
-        Milestone storage currentMilestone = milestones[milestoneCount];
+        // Release funds to the artist
+        artist.transfer(escrowBalance);
+        escrowBalance = 0;
 
-        // Check if the milestone is not already completed
-        require(!currentMilestone.isCompleted, "Milestone already completed");
+        isCompleted = true;
 
-        // Mark the milestone as completed
-        currentMilestone.isCompleted = true;
-
-        // Release fund and mark as completed if this is the last milestone
-        if(milestoneCount == milestones.length - 1) {
-            artist.transfer(escrowBalance);
-            escrowBalance = 0;
-            isCompleted = true;
-        }
-
-        milestoneCount++;
-
-        emit CommissionAction(msg.sender, "Milestone approved, refund provided", block.timestamp);
+        emit CommissionAction(msg.sender, "Artwork approved, payment released", block.timestamp);
     }
 
     // Function to handle cancellation and refund with fee deduction
     function cancelContract() external onlyParties {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
         
-        // Find the current milestone
-        Milestone storage currentMilestone = milestones[milestoneCount];
-
-        // Refund the payment to the client
-        uint256 refundAmount = escrowBalance * (100 - currentMilestone.fundPercentage) / 100;
+        // Refund 50% of the payment to the client
+        uint256 refundAmount = (escrowBalance * 50) / 100;
         client.transfer(refundAmount);
         
-        // Pay the payment to the artist
+        // Pay 50% of the payment to the artist
         artist.transfer(escrowBalance - refundAmount);
-
         escrowBalance = 0;
+
         isCancelled = true;
+
         emit CommissionAction(msg.sender, "Contract cancelled, partial refund provided", block.timestamp);
     }
 
     // Function for the client to request a revision
     function requestRevision() external onlyClient {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
-        
-        // Find the current milestone
-        Milestone storage currentMilestone = milestones[milestoneCount];
+        require(!revisionRequested, "Artist is still working on the revised artwork");
+        require(revisionCount < maxRevisions, "Maximum number of revisions reached");
 
-        require(currentMilestone.revisionCount < maxRevisions, "Maximum number of revisions reached");
-
-        milestones[milestoneCount].revisionCount++;
+        artFinished = false;
+        revisionRequested = true;
+        revisionCount++;
 
         emit CommissionAction(msg.sender, "Revision requested", block.timestamp);
     }
 
-    // (NOT DONE YET) Function for the artist to submit a revised version of the artwork
+    // Function for the artist to submit a revised version of the artwork
     function submitRevisedArtwork(string memory _ipfsHash) external onlyArtist {
-        require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
-        
-        // Store the last IPFS hash
+        require(revisionRequested, "No revision requested");
+
+        // Save the current IPFS hash to the history
+        ipfsHashHistory.push(ipfsHash);
         ipfsHash = _ipfsHash;
 
-        // Find the current milestone
-        Milestone storage currentMilestone = milestones[milestoneCount];
-
-        // Check if the milestone is not already completed
-        require(!currentMilestone.isCompleted, "Milestone already completed");
-
-        // Store the IPFS hash
-        ipfsHashes.push(_ipfsHash);
-        ipfsHashHistory[milestoneCount].lastIpfsHash = _ipfsHash;
-        ipfsHashHistory[milestoneCount].ipfsHashes = ipfsHashes;
+        artFinished = true;
+        revisionRequested = false;
 
         emit CommissionAction(msg.sender, "Revised artwork submitted", block.timestamp);
     }
