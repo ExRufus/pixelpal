@@ -2,9 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-contract ArtCommissionContract {
+contract artCommissionContract {
     address payable public artist;
     address payable public client;
     address payable public serviceProvider;
@@ -18,7 +16,6 @@ contract ArtCommissionContract {
     bool public isCompleted;
     bool public artFinished;
     bool public revisionRequested;
-    IERC20 public token; // ERC-20 token contract
 
     // Event to log key contract actions
     event CommissionAction(address indexed initiator, string action, uint256 timestamp);
@@ -40,34 +37,45 @@ contract ArtCommissionContract {
     }
 
     // Contract initialization
-    constructor(
-        address payable _artist,
-        address payable _client,
-        address payable _serviceProvider,
-        uint256 _totalCost,
-        uint256 _maxRevisions,
-        address _tokenAddress // ERC-20 token address
-    ) {
-        artist = _artist;
-        client = _client;
-        serviceProvider = _serviceProvider;
-        totalCost = _totalCost;
-        maxRevisions = _maxRevisions;
+    constructor() {
+        artist = payable(address(0)); // No specific artist initially
+        client = payable(address(0)); // No specific client initially
+        serviceProvider = payable(msg.sender); // The service provider is the one deploying the contract
         isCancelled = false;
         isCompleted = false;
         artFinished = false;
         escrowBalance = 0;
-        token = IERC20(_tokenAddress); // Initialize ERC-20 token contract
+        totalCost = 0;
+        maxRevisions = 0;
 
         emit CommissionAction(msg.sender, "Contract initiated", block.timestamp);
+    }
+
+    function setClientAddress(address payable _client) external onlyArtist {
+        require(client == address(0), "Client address already set");
+        client = _client;
+    }
+
+    function setArtistAddress(address payable _artist) external onlyParties {
+        require(artist == address(0), "Service provider address already set");
+        artist = _artist;
+    }
+
+    function setTotalCost(uint256 _totalCost) external onlyArtist {
+        require(totalCost == 0, "Total cost already set");
+        totalCost = _totalCost;
+    }
+
+    function setMaxRevisions(uint256 _maxRevisions) external onlyParties {
+        require(maxRevisions == 0, "Max revisions already set");
+        maxRevisions = _maxRevisions;
     }
 
     // Function for the client to make full payment to escrow with fee deduction
     function makeFullPayment() external payable onlyClient {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
 
-        // Use ERC-20 transferFrom function to receive payment
-        require(token.transferFrom(client, address(this), totalCost * 105 / 100), "Transfer failed");
+        require(msg.value == totalCost * 105 / 100, "Incorrect payment amount");
 
         // Deduct 5% fee and send it to the service provider
         uint256 serviceFee = (msg.value * 5) / 105;
