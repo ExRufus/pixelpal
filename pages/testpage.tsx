@@ -2,13 +2,21 @@ import { useState } from "react";
 import SearchIcon from "../components/icons/SearchIcon";
 import StarIcon from "../components/icons/StarIcon";
 import ChevronDownIcon from "../components/icons/ChevronDownIcon";
+import ArrowDownIcon from "../components/icons/ArrowDownIcon";
 // bg-[#9A9CE9]
 export default function TestPage() {
   const [dropdown, setDropdown] = useState<"hidden" | "shown">("hidden");
 
+  function scrollDown() {
+    return window.scrollTo({
+      top: window.innerHeight,
+      behavior: "smooth",
+    });
+  }
+
   return (
     <div className="">
-      <nav className="fixed bg-violet-400 w-screen h-[60px] px-4 flex flex-row items-center justify-between">
+      <nav className="fixed z-10 bg-violet-400 w-screen h-[60px] px-4 flex flex-row items-center justify-between">
         <div className="flex flex-row items-center gap-10">
           <h4 className="text-xl">PixelPal</h4>
 
@@ -24,15 +32,6 @@ export default function TestPage() {
 
         {/* Button collections */}
         <div className="flex flex-row items-center gap-4">
-          <button className="hover:bg-violet-500 px-3 py-1 rounded-lg transition">
-            Chat
-          </button>
-          <button className="hover:bg-violet-500 px-3 py-1 rounded-lg transition">
-            Notification
-          </button>
-          <button className="hover:bg-violet-500 px-3 py-1 rounded-lg transition">
-            Orders
-          </button>
           <div className="relative">
             <button
               className="hover:bg-violet-500 px-3 py-1 rounded-lg transition"
@@ -69,6 +68,9 @@ export default function TestPage() {
                   Sell Arts
                 </li>
                 <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
+                  Orders
+                </li>
+                <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
                   Settings
                 </li>
                 <li className="active:scale-95 hover:bg-sky-400 transition px-4 py-2 rounded-lg">
@@ -82,10 +84,16 @@ export default function TestPage() {
 
       <main className="bg-white pt-[60px]">
         {/* Main Header */}
-        <section className="h-screen w-screen flex items-center justify-center">
-          <h1 className="text-8xl text-center">
+        <section className="h-screen w-screen flex flex-col items-center justify-center">
+          <h1 className="w-full flex text-center items-center justify-center text-[150px] leading-[1] gradient-text">
             Discover <br /> The World <br /> of Art
           </h1>
+          <button
+            onClick={scrollDown}
+            className="mt-10 animate-bounce bg-slate-200 rounded-full flex items-center justify-center w-10 h-10"
+          >
+            <ArrowDownIcon className="text-slate-600" />
+          </button>
         </section>
 
         {/* Top Artist */}
