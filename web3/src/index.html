@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client and Artist Page</title>
+</head>
+<body>
+    <!--Connect to Metamask-->
+    <h2>Connect to Metamask</h2>
+    <button id ="connectMetamaskBtn" onclick="connectMetamask()">Connect Metamask</button>
+
+    <hr>
+
+    <!-- Client Side -->
+    <h2>Client Side</h2>
+    <label for="clientAddress">Set Client Address:</label>
+    <input type="text" id="clientAddress">
+    <button id="setClientAddressBtn" onclick="setClientAddress()">Set Client Address</button>
+    <br>
+    <button id="makeFullPaymentBtn" onclick="makeFullPayment()">Make Full Payment</button>
+    <br>
+    <button id="approveArtworkBtn" onclick="approveArtwork()">Approve Artwork</button>
+    <br>
+    <button id="cancelContractBtn" onclick="cancelContract()">Cancel Contract</button>
+    <br>
+    <button id="requestRevisionBtn" onclick="requestRevision()">Request Revision</button>
+
+    <hr>
+
+    <!-- Artist Side -->
+    <h2>Artist Side</h2>
+    <label for="artistAddress">Set Artist Address:</label>
+    <input type="text" id="artistAddress">
+    <button id="setArtistAddressBtn" onclick="setArtistAddress()">Set Artist Address</button>
+    <br>
+    <label for="totalCost">Set Total Cost:</label>
+    <input type="text" id="totalCost">
+    <button id="setTotalCostBtn" onclick="setTotalCost()">Set Total Cost</button>
+    <br>
+    <label for="maxRevision">Set Max Revision:</label>
+    <input type="text" id="maxRevision">
+    <button id="setMaxRevisionsBtn" onclick="setMaxRevisions()">Set Max Revisions</button>
+    <br>
+    <button id="submitArtworkBtn" onclick="submitArtwork()">Submit Artwork</button>
+    <br>
+    <button id="submitRevisedArtworkBtn" onclick="submitRevisedArtwork()">Submit Revised Artwork</button>
+    <br>
+    <button id="cancelContractBtn2" onclick="cancelContract()">Cancel Contract</button>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js"></script>
+    <script>
+        // Replace with your Ethereum node URL or Infura key
+        const APIUrl = 'https://goerli.infura.io/v3/a41c4ae2c4514d3c8313f85fa08a4391';
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        // Replace with the address of your deployed smart contract
+        const contractAddress = '0x172f9EC816cf1358234527000e2Db433A03207c7';
+
+        // Replace with your smart contract ABI
+        const contractABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "initiator",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "action",
+                    "type": "string"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                }
+                ],
+                "name": "CommissionAction",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "approveArtwork",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "artFinished",
+                "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "artist",
+                "outputs": [
+                {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "cancelContract",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "checkContractStatus",
+                "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "client",
+                "outputs": [
+                {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "escrowBalance",
+                "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "ipfsHash",
+                "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+                ],
+                "name": "ipfsHashHistory",
+                "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "isCancelled",
+                "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "isCompleted",
+                "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "makeFullPayment",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "maxRevisions",
+                "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "requestRevision",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "revisionCount",
+                "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "revisionRequested",
+                "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "serviceProvider",
+                "outputs": [
+                {
+                    "internalType": "address payable",
+                    "name": "",
+                    "type": "address"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "address payable",
+                    "name": "_artist",
+                    "type": "address"
+                }
+                ],
+                "name": "setArtistAddress",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "address payable",
+                    "name": "_client",
+                    "type": "address"
+                }
+                ],
+                "name": "setClientAddress",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_maxRevisions",
+                    "type": "uint256"
+                }
+                ],
+                "name": "setMaxRevisions",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_totalCost",
+                    "type": "uint256"
+                }
+                ],
+                "name": "setTotalCost",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_ipfsHash",
+                    "type": "string"
+                }
+                ],
+                "name": "submitArtwork",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_ipfsHash",
+                    "type": "string"
+                }
+                ],
+                "name": "submitRevisedArtwork",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalCost",
+                "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // Create a contract instance
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        
+        // Placeholder functions for illustration
+        async function connectMetamask() {
+            if (typeof window.ethereum != "undefined") {
+                ethereum.request({method: "eth_requestAccounts"})
+            }
+        }
+
+        async function setClientAddress() {
+            const clientAddress = document.getElementById('clientAddress').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.setClientAddress(clientAddress);
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function makeFullPayment() {
+            const clientAddress = document.getElementById('clientAddress').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.makeFullPayment({ value: ethers.utils.parseEther('1') });
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function submitArtwork() {
+            const artistAddress = document.getElementById('artistAddress').value;
+            const ipfsHash = document.getElementById('artworkIpfsHash').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.submitArtwork(ipfsHash);
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function approveArtwork() {
+            const clientAddress = document.getElementById('clientAddress').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.approveArtwork();
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function cancelContract() {
+            const clientAddress = document.getElementById('clientAddress').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.cancelContract();
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function requestRevision() {
+            const clientAddress = document.getElementById('clientAddress').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.requestRevision();
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function submitRevisedArtwork() {
+            const artistAddress = document.getElementById('artistAddress').value;
+            const ipfsHash = document.getElementById('revisedArtworkIpfsHash').value;
+            const signer = contract.connect(provider.getSigner());
+            const tx = await signer.submitRevisedArtwork(ipfsHash);
+            await tx.wait();
+            console.log('Transaction hash:', tx.hash);
+        }
+
+        async function setArtistAddress() {
+            const artistAddress = document.getElementById('artistAddress').value;
+            await contract.setArtistAddress(artistAddress);
+            console.log('Artist address set successfully');
+        }
+
+        async function setTotalCost() {
+            const totalCost = ethers.utils.parseEther(document.getElementById('totalCost').value);
+            await contract.setTotalCost(totalCost);
+            console.log('Total cost set successfully');
+        }
+
+        async function setMaxRevisions() {
+            const maxRevisions = document.getElementById('maxRevision').value;
+            await contract.setMaxRevisions(maxRevisions);
+            console.log('Max revisions set successfully');
+        }
+
+        // Handle UI interactions
+        document.getElementById('setClientAddressBtn').addEventListener('click', setClientAddress);
+        document.getElementById('makeFullPaymentBtn').addEventListener('click', makeFullPayment);
+        document.getElementById('submitArtworkBtn').addEventListener('click', submitArtwork);
+        document.getElementById('approveArtworkBtn').addEventListener('click', approveArtwork);
+        document.getElementById('cancelContractBtn').addEventListener('click', cancelContract);
+        document.getElementById('requestRevisionBtn').addEventListener('click', requestRevision);
+        document.getElementById('submitRevisedArtworkBtn').addEventListener('click', submitRevisedArtwork);
+        document.getElementById('setArtistAddressBtn').addEventListener('click', setArtistAddress);
+        document.getElementById('setTotalCostBtn').addEventListener('click', setTotalCost);
+        document.getElementById('setMaxRevisionsBtn').addEventListener('click', setMaxRevisions);
+        document.getElementById('cancelContractBtn2').addEventListener('click', cancelContract);
+    </script>
+</body>
+</html>

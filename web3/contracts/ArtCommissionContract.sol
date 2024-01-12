@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-contract artCommissionContract {
+contract ArtCommissionContract {
     address payable public artist;
     address payable public client;
     address payable public serviceProvider;
@@ -17,10 +17,8 @@ contract artCommissionContract {
     bool public artFinished;
     bool public revisionRequested;
 
-    // Event to log key contract actions
     event CommissionAction(address indexed initiator, string action, uint256 timestamp);
 
-    // Modifier to ensure that only authorized account can call specific functions
     modifier onlyParties() {
         require(msg.sender == artist || msg.sender == client || msg.sender == serviceProvider, "Not authorized");
         _;
@@ -51,17 +49,17 @@ contract artCommissionContract {
         emit CommissionAction(msg.sender, "Contract initiated", block.timestamp);
     }
 
-    function setClientAddress(address payable _client) external onlyArtist {
+    function setClientAddress(address payable _client) external {
         require(client == address(0), "Client address already set");
         client = _client;
     }
 
-    function setArtistAddress(address payable _artist) external onlyParties {
-        require(artist == address(0), "Service provider address already set");
+    function setArtistAddress(address payable _artist) external {
+        require(artist == address(0), "Artist address already set");
         artist = _artist;
     }
 
-    function setTotalCost(uint256 _totalCost) external onlyArtist {
+    function setTotalCost(uint256 _totalCost) external onlyParties {
         require(totalCost == 0, "Total cost already set");
         totalCost = _totalCost;
     }
@@ -72,7 +70,7 @@ contract artCommissionContract {
     }
 
     // Function for the client to make full payment to escrow with fee deduction
-    function makeFullPayment() external payable onlyClient {
+    function makeFullPayment() external payable onlyParties {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
 
         require(msg.value == totalCost * 105 / 100, "Incorrect payment amount");
@@ -88,7 +86,7 @@ contract artCommissionContract {
     }
 
     // Function for the artist to submit the completed artwork
-    function submitArtwork(string memory _ipfsHash) external onlyArtist {
+    function submitArtwork(string memory _ipfsHash) external onlyParties {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
 
         // Store the IPFS hash
@@ -101,7 +99,7 @@ contract artCommissionContract {
     }
 
     // Function for the client to approve the artwork
-    function approveArtwork() external onlyClient {
+    function approveArtwork() external onlyParties {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
         require(artFinished, "Artist is still working on the revised artwork");
 
@@ -132,7 +130,7 @@ contract artCommissionContract {
     }
 
     // Function for the client to request a revision
-    function requestRevision() external onlyClient {
+    function requestRevision() external onlyParties {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
         require(!revisionRequested, "Artist is still working on the revised artwork");
         require(revisionCount < maxRevisions, "Maximum number of revisions reached");
@@ -145,7 +143,7 @@ contract artCommissionContract {
     }
 
     // Function for the artist to submit a revised version of the artwork
-    function submitRevisedArtwork(string memory _ipfsHash) external onlyArtist {
+    function submitRevisedArtwork(string memory _ipfsHash) external onlyParties {
         require(revisionRequested, "No revision requested");
 
         // Save the current IPFS hash to the history
