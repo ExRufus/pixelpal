@@ -111,46 +111,31 @@ export default function TestPage() {
         {/* Top Artist */}
         <section className="w-10/12 m-auto">
           <h4 className="text-6xl">Artist</h4>
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <ul className="bg-stone-300">
-              {[1, 2, 3, 4].map((artist) => (
-                <li
-                  key={artist}
-                  className="flex p-4 gap-2 items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className="w-6 h-6 rounded-full"
-                      src="/images/girl_avatar.png"
-                      alt=""
-                    />
-                    <p>Artist Name</p>
-                  </div>
-                  <p>Overal Ratingsa 5.00</p>
-                </li>
-              ))}
-            </ul>
-            <div className="bg-stone-300">
-              {[5, 6, 7, 8].map((artist) => (
-                <li
-                  key={artist}
-                  className="flex p-4 gap-2 items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className="w-6 h-6 rounded-full"
-                      src="/images/girl_avatar.png"
-                      alt=""
-                    />
-                    <p>Artist Name</p>
-                  </div>
-                  <p>Overal Ratingsa 5.00</p>
-                </li>
-              ))}
-            </div>
-          </div>
+
+          <ul className=" grid grid-cols-2 gap-2 mt-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((artist) => (
+              <li
+                key={artist}
+                className="flex p-4 py-6 gap-2 items-center justify-between bg-stone-50 rounded-xl hover:bg-stone-100 transition"
+              >
+                <div className="flex items-center gap-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="w-6 h-6 rounded-full"
+                    src="/images/girl_avatar.png"
+                    alt=""
+                  />
+                  <p>Artist Name</p>
+                </div>
+                <div className="flex items-center">
+                  <p>Overal Ratings 5.00</p>
+                  <p className="text-yellow-500">
+                    <StarIcon />
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Arts/Commision */}
