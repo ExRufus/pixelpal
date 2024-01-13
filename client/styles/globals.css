@@ -2,54 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: Inter, Helvetica, Arial, sans-serif;
+/* Gradient text for landing page */
+.gradient-text {
+  background: linear-gradient(
+    to right,
+    #7953cd 20%,
+    #00affa 30%,
+    #0190cd 70%,
+    #764ada 80%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+  background-size: 500% auto;
+  animation: textShine 5s ease-in-out infinite alternate;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-/* html {
-  color-scheme: dark;
-} */
-
-body {
-  color: black;
-  background: white;
-  --color-primary: #fada3f;
-  --color-secondary: #ff2136;
-  --color-tertiary: #0294fe;
-  --color-quaternary: #9b4dff;
-  --card-background: #252133;
-  --highlighted-background: #202326;
-  font-weight: 400;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    color: #ffffff;
-    background: #191c1f;
+@keyframes textShine {
+  0% {
+    background-position: 0% 50%;
   }
-}
-
-h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-h3 {
-  font-size: 22px;
-  line-height: 28px;
-  font-weight: 700;
-  margin-bottom: 0px;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
+  100% {
+    background-position: 100% 50%;
+  }
 }

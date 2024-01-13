@@ -3,8 +3,14 @@ import SearchIcon from "../components/icons/SearchIcon";
 import StarIcon from "../components/icons/StarIcon";
 import ChevronDownIcon from "../components/icons/ChevronDownIcon";
 import ArrowDownIcon from "../components/icons/ArrowDownIcon";
-// bg-[#9A9CE9]
+import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
+import Link from "next/link";
+import Image from "next/image";
+import { truncateAddress } from "../util/truncateAddress";
+
 export default function TestPage() {
+  const address = useAddress();
+  console.log({ address });
   const [dropdown, setDropdown] = useState<"hidden" | "shown">("hidden");
 
   function scrollDown() {
@@ -33,26 +39,32 @@ export default function TestPage() {
         {/* Button collections */}
         <div className="flex flex-row items-center gap-4">
           <div className="relative">
-            <button
-              className="hover:bg-violet-500 px-3 py-1 rounded-lg transition"
-              onClick={() =>
-                setDropdown((p) => (p === "hidden" ? "shown" : "hidden"))
-              }
-            >
-              <div className="flex items-center gap-1">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="w-10 h-10 rounded-full"
-                  src="/images/girl_avatar.png"
-                  alt="avatar"
-                />
-                <div>
-                  <p className="text-xs">0x23.....28</p>
-                  <p className="text-xs">10.00 ETH</p>
+            {address ? (
+              <button
+                className="hover:bg-violet-500 px-3 py-1 rounded-lg transition"
+                onClick={() =>
+                  setDropdown((p) => (p === "hidden" ? "shown" : "hidden"))
+                }
+              >
+                <div className="flex items-center gap-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="w-10 h-10 rounded-full"
+                    src="/images/girl_avatar.png"
+                    alt="avatar"
+                  />
+                  <div>
+                    <p className="text-xs">{truncateAddress(address)}</p>
+                    <p className="text-xs">10.00 ETH</p>
+                  </div>
+                  <ChevronDownIcon />
                 </div>
-                <ChevronDownIcon />
+              </button>
+            ) : (
+              <div className="">
+                <ConnectWallet theme="light" btnTitle="Connect Wallet" />
               </div>
-            </button>
+            )}
 
             {/* Dropdown */}
             <div
@@ -85,7 +97,7 @@ export default function TestPage() {
       <main className="bg-white pt-[60px]">
         {/* Main Header */}
         <section className="h-screen w-screen flex flex-col items-center justify-center">
-          <h1 className="w-full flex text-center items-center justify-center text-[150px] leading-[1] gradient-text">
+          <h1 className="w-full flex text-center items-center justify-center text-[150px] leading-[1] gradient-text font-bold">
             Discover <br /> The World <br /> of Art
           </h1>
           <button
@@ -144,39 +156,44 @@ export default function TestPage() {
         {/* Arts/Commision */}
         <section className="w-10/12 m-auto mt-20">
           <h4 className="text-6xl">Arts/Commision</h4>
-          <div className="grid grid-cols-3 gap-10 mt-4">
+          <div className="grid grid-cols-3 gap-10 mt-4 group">
             {Array.from({ length: 20 }, (_, i) => i + 1).map((art) => (
-              <div key={art} className="rounded-lg">
+              <article
+                key={art}
+                className="cursor-pointer rounded-lg transition hover:bg-slate-100"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/green_landscape_beautiful.png"
                   alt="trees"
                   className="w-full rounded-t-lg"
                 />
-                <p className="text-xl mt-2">Genshin Commision Art</p>
-                <div className="flex items-center gap-1 mt-1">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/girl_avatar.png"
-                    className="w-6 h-6 rounded-full"
-                    alt="avatar"
-                  />
-                  <p>Artist username</p>
-                </div>
-                <div className="flex justify-between mt-1">
-                  <div className="flex gap-6 items-center">
-                    <p className="text-slate-500 text-sm">150 reviews</p>
-                    <div className="flex items-center">
-                      <p className="text-yellow-500">
-                        <StarIcon />
-                      </p>
-                      &nbsp;
-                      <p>4.8</p>
-                    </div>
+                <div className="px-2 pb-2">
+                  <p className="text-xl mt-2">Genshin Commision Art</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/girl_avatar.png"
+                      className="w-6 h-6 rounded-full"
+                      alt="avatar"
+                    />
+                    <p>Artist username</p>
                   </div>
-                  <p className="text-lg font-bold">0.04 ETH</p>
+                  <div className="flex justify-between mt-1">
+                    <div className="flex gap-6 items-center">
+                      <p className="text-slate-500 text-sm">150 reviews</p>
+                      <div className="flex items-center">
+                        <p className="text-yellow-500">
+                          <StarIcon />
+                        </p>
+                        &nbsp;
+                        <p>4.8</p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold">0.04 ETH</p>
+                  </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         </section>
