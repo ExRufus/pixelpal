@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import SearchIcon from "../components/icons/SearchIcon";
 import StarIcon from "../components/icons/StarIcon";
 import ChevronDownIcon from "../components/icons/ChevronDownIcon";
@@ -7,11 +7,22 @@ import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
 import Link from "next/link";
 import Image from "next/image";
 import { truncateAddress } from "../util/truncateAddress";
+import { Dialog, Transition } from "@headlessui/react";
+import XMarkIcon from "../components/icons/XMarkIcon";
 
 export default function TestPage() {
   const address = useAddress();
   console.log({ address });
   const [dropdown, setDropdown] = useState<"hidden" | "shown">("hidden");
+
+  let [isOpen, setIsOpen] = useState(true);
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
 
   function scrollDown() {
     return window.scrollTo({
@@ -22,6 +33,110 @@ export default function TestPage() {
 
   return (
     <div className="">
+      {/* Dialog */}
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* left side */}
+                    <div>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/images/green_landscape_beautiful.png"
+                        alt="trees"
+                        className="w-full rounded-lg"
+                      />
+
+                      <div className="flex items-center justify-between mt-2">
+                        <h3 className="text-xl font-medium leading-6 text-gray-900">
+                          Title Title Title
+                        </h3>
+                        <p className="text-green-600 text-sm">available</p>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        {/* Image or artist */}
+                        <div className="flex items-center gap-1 mt-1">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src="/images/girl_avatar.png"
+                            className="w-6 h-6 rounded-full"
+                            alt="avatar"
+                          />
+                          <p>Artist username</p>
+                        </div>
+                        <p className="text-lg font-bold">0.04 ETH</p>
+                      </div>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          Description (if the description longer then the “item
+                          preview&apos;s frame” will also be longer)
+                        </p>
+                      </div>
+                    </div>
+                    {/* right side */}
+                    <div>
+                      <div className="flex justify-end">
+                        <button
+                          onClick={closeModal}
+                          className="rounded-full bg-stone-100 hover:bg-stone-300 p-1"
+                        >
+                          <XMarkIcon />
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <button className="bg-violet-200 text-violet-900 font-medium hover:bg-violet-300 px-8 py-2 rounded-md transition">
+                          Buy
+                        </button>
+                        <button className="bg-teal-200 text-teal-900 font-medium hover:bg-teal-300 px-8 py-2 rounded-md transition">
+                          Contact Artist
+                        </button>
+                      </div>
+                      <div className="mt-2">
+                        <div className="flex items-center gap-1">
+                          <p>Rating 4.8/5.0</p>
+                          <p className="text-yellow-500">
+                            <StarIcon />
+                          </p>
+                        </div>
+                        <p>0 Reviews</p>
+                      </div>
+                      <div className="mt-2">
+                        <div className="italic text-sm text-slate-400">
+                          No buyer yet
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
       <nav className="fixed z-10 bg-violet-400 w-screen h-[60px] px-4 flex flex-row items-center justify-between">
         <div className="flex flex-row items-center gap-10">
           <h4 className="text-xl">PixelPal</h4>
@@ -146,6 +261,7 @@ export default function TestPage() {
               <article
                 key={art}
                 className="cursor-pointer rounded-lg transition hover:bg-slate-100"
+                onClick={openModal}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -185,9 +301,6 @@ export default function TestPage() {
       </main>
       <footer className="bg-slate-300 flex items-center justify-between px-10 py-4 mt-20">
         <p className="text-lg text-violet-900">&#174; 2024 PixelPal</p>
-        <div className="text-sm">
-          <p>Contact Us: N/A</p>
-        </div>
       </footer>
     </div>
   );
