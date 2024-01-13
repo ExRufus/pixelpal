@@ -38,7 +38,7 @@ contract ArtCommissionContract {
     constructor() {
         artist = payable(address(0)); // No specific artist initially
         client = payable(address(0)); // No specific client initially
-        serviceProvider = payable(msg.sender); // The service provider is the one deploying the contract
+        serviceProvider = payable(address(0)); // The service provider is the one deploying the contract
         isCancelled = false;
         isCompleted = false;
         artFinished = false;
@@ -59,6 +59,11 @@ contract ArtCommissionContract {
         artist = _artist;
     }
 
+    function setServiceProviderAddress(address payable _serviceProvider) external {
+        require(serviceProvider == address(0), "Service provider address already set");
+        serviceProvider = _serviceProvider;
+    }
+
     function setTotalCost(uint256 _totalCost) external onlyParties {
         require(totalCost == 0, "Total cost already set");
         totalCost = _totalCost;
@@ -73,7 +78,7 @@ contract ArtCommissionContract {
     function makeFullPayment() external payable onlyParties {
         require(!isCompleted && !isCancelled, "Contract is already completed or cancelled");
 
-        require(msg.value == totalCost * 105 / 100, "Incorrect payment amount");
+        require(msg.value >= totalCost * 105 / 100, "Incorrect payment amount");
 
         // Deduct 5% fee and send it to the service provider
         uint256 serviceFee = (msg.value * 5) / 105;

@@ -10,6 +10,11 @@
     <!--Connect to Metamask-->
     <h2>Connect to Metamask</h2>
     <button id ="connectMetamaskBtn" onclick="connectMetamask()">Connect Metamask</button>
+    <br>
+    <label for="serviceProviderAddress">Set Service Provider Address:</label>
+    <input type="text" id="serviceProviderAddress">
+    <button id="setServiceProviderAddressBtn" onclick="setServiceProviderAddress()">Set Service Provider Address</button>
+    <br>
 
     <hr>
 
@@ -23,10 +28,10 @@
     <br>
     <button id="approveArtworkBtn" onclick="approveArtwork()">Approve Artwork</button>
     <br>
-    <button id="cancelContractBtn" onclick="cancelContract()">Cancel Contract</button>
-    <br>
     <button id="requestRevisionBtn" onclick="requestRevision()">Request Revision</button>
-
+    <br>
+    <button id="cancelContractBtn" onclick="cancelContract()">Cancel Contract</button>
+    
     <hr>
 
     <!-- Artist Side -->
@@ -43,8 +48,12 @@
     <input type="text" id="maxRevision">
     <button id="setMaxRevisionsBtn" onclick="setMaxRevisions()">Set Max Revisions</button>
     <br>
+    <label for="artworkIpfsHash">Input artwork url:</label>
+    <input type="text" id="artworkIpfsHash">
     <button id="submitArtworkBtn" onclick="submitArtwork()">Submit Artwork</button>
     <br>
+    <label for="revisedArtworkIpfsHash">Input revised artwork url:</label>
+    <input type="text" id="revisedArtworkIpfsHash">
     <button id="submitRevisedArtworkBtn" onclick="submitRevisedArtwork()">Submit Revised Artwork</button>
     <br>
     <button id="cancelContractBtn2" onclick="cancelContract()">Cancel Contract</button>
@@ -57,440 +66,449 @@
         const provider = new ethers.providers.Web3Provider(window.ethereum);
 
         // Replace with the address of your deployed smart contract
-        const contractAddress = '0x172f9EC816cf1358234527000e2Db433A03207c7';
+        const contractAddress = '0x5113C05155482080b0D03ff07D1154E241AEA730';
 
         // Replace with your smart contract ABI
         const contractABI = [
             {
-                "inputs": [],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
+            "inputs": [],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
             },
             {
-                "anonymous": false,
-                "inputs": [
+            "anonymous": false,
+            "inputs": [
                 {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "initiator",
-                    "type": "address"
+                "indexed": true,
+                "internalType": "address",
+                "name": "initiator",
+                "type": "address"
                 },
                 {
-                    "indexed": false,
-                    "internalType": "string",
-                    "name": "action",
-                    "type": "string"
+                "indexed": false,
+                "internalType": "string",
+                "name": "action",
+                "type": "string"
                 },
                 {
-                    "indexed": false,
-                    "internalType": "uint256",
-                    "name": "timestamp",
-                    "type": "uint256"
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
                 }
-                ],
-                "name": "CommissionAction",
-                "type": "event"
+            ],
+            "name": "CommissionAction",
+            "type": "event"
             },
             {
-                "inputs": [],
-                "name": "approveArtwork",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            "inputs": [],
+            "name": "approveArtwork",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "artFinished",
-                "outputs": [
+            "inputs": [],
+            "name": "artFinished",
+            "outputs": [
                 {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "artist",
-                "outputs": [
+            "inputs": [],
+            "name": "artist",
+            "outputs": [
                 {
-                    "internalType": "address payable",
-                    "name": "",
-                    "type": "address"
+                "internalType": "address payable",
+                "name": "",
+                "type": "address"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "cancelContract",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            "inputs": [],
+            "name": "cancelContract",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "checkContractStatus",
-                "outputs": [
+            "inputs": [],
+            "name": "checkContractStatus",
+            "outputs": [
                 {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
                 },
                 {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "client",
-                "outputs": [
+            "inputs": [],
+            "name": "client",
+            "outputs": [
                 {
-                    "internalType": "address payable",
-                    "name": "",
-                    "type": "address"
+                "internalType": "address payable",
+                "name": "",
+                "type": "address"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "escrowBalance",
-                "outputs": [
+            "inputs": [],
+            "name": "escrowBalance",
+            "outputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "ipfsHash",
-                "outputs": [
+            "inputs": [],
+            "name": "ipfsHash",
+            "outputs": [
                 {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
+                "internalType": "string",
+                "name": "",
+                "type": "string"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
                 }
-                ],
-                "name": "ipfsHashHistory",
-                "outputs": [
+            ],
+            "name": "ipfsHashHistory",
+            "outputs": [
                 {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
+                "internalType": "string",
+                "name": "",
+                "type": "string"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "isCancelled",
-                "outputs": [
+            "inputs": [],
+            "name": "isCancelled",
+            "outputs": [
                 {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "isCompleted",
-                "outputs": [
+            "inputs": [],
+            "name": "isCompleted",
+            "outputs": [
                 {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "makeFullPayment",
-                "outputs": [],
-                "stateMutability": "payable",
-                "type": "function"
+            "inputs": [],
+            "name": "makeFullPayment",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "maxRevisions",
-                "outputs": [
+            "inputs": [],
+            "name": "maxRevisions",
+            "outputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "requestRevision",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            "inputs": [],
+            "name": "requestRevision",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "revisionCount",
-                "outputs": [
+            "inputs": [],
+            "name": "revisionCount",
+            "outputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "revisionRequested",
-                "outputs": [
+            "inputs": [],
+            "name": "revisionRequested",
+            "outputs": [
                 {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "serviceProvider",
-                "outputs": [
+            "inputs": [],
+            "name": "serviceProvider",
+            "outputs": [
                 {
-                    "internalType": "address payable",
-                    "name": "",
-                    "type": "address"
+                "internalType": "address payable",
+                "name": "",
+                "type": "address"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "stateMutability": "view",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "address payable",
-                    "name": "_artist",
-                    "type": "address"
+                "internalType": "address payable",
+                "name": "_artist",
+                "type": "address"
                 }
-                ],
-                "name": "setArtistAddress",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            ],
+            "name": "setArtistAddress",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "address payable",
-                    "name": "_client",
-                    "type": "address"
+                "internalType": "address payable",
+                "name": "_client",
+                "type": "address"
                 }
-                ],
-                "name": "setClientAddress",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            ],
+            "name": "setClientAddress",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "_maxRevisions",
-                    "type": "uint256"
+                "internalType": "uint256",
+                "name": "_maxRevisions",
+                "type": "uint256"
                 }
-                ],
-                "name": "setMaxRevisions",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            ],
+            "name": "setMaxRevisions",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "_totalCost",
-                    "type": "uint256"
+                "internalType": "address payable",
+                "name": "_serviceProvider",
+                "type": "address"
                 }
-                ],
-                "name": "setTotalCost",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            ],
+            "name": "setServiceProviderAddress",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "_ipfsHash",
-                    "type": "string"
+                "internalType": "uint256",
+                "name": "_totalCost",
+                "type": "uint256"
                 }
-                ],
-                "name": "submitArtwork",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            ],
+            "name": "setTotalCost",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [
+            "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "_ipfsHash",
-                    "type": "string"
+                "internalType": "string",
+                "name": "_ipfsHash",
+                "type": "string"
                 }
-                ],
-                "name": "submitRevisedArtwork",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
+            ],
+            "name": "submitArtwork",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
             },
             {
-                "inputs": [],
-                "name": "totalCost",
-                "outputs": [
+            "inputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
+                "internalType": "string",
+                "name": "_ipfsHash",
+                "type": "string"
                 }
-                ],
-                "stateMutability": "view",
-                "type": "function"
+            ],
+            "name": "submitRevisedArtwork",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "totalCost",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
             }
         ];
-
+  
         // Create a contract instance
         const signer = provider.getSigner();
         const contract = new ethers.Contract(contractAddress, contractABI, signer);
         
         // Placeholder functions for illustration
         async function connectMetamask() {
-            if (typeof window.ethereum != "undefined") {
-                ethereum.request({method: "eth_requestAccounts"})
+            if (typeof window.ethereum !== "undefined") {
+                await ethereum.request({ method: "eth_requestAccounts" });
             }
+        }
+
+        async function executeTransaction(func, params) {
+            try {
+                const tx = await func(...params);
+                await tx.wait();
+                console.log('Transaction hash:', tx.hash);
+            } catch (error) {
+                console.error('Transaction error:', error);
+            }
+        }
+
+        async function executePayableTransaction(func, params, value) {
+            try {
+                const tx = await func(...params, { value: value });
+                await tx.wait();
+                console.log('Transaction hash:', tx.hash);
+            } catch (error) {
+                console.error('Transaction error:', error);
+            }
+        }
+
+        async function setServiceProviderAddress() {
+            const serviceProviderAddress = document.getElementById('serviceProviderAddress').value;
+            await executeTransaction(contract.setServiceProviderAddress, [serviceProviderAddress]);
+            console.log('Service provider address set successfully');
         }
 
         async function setClientAddress() {
             const clientAddress = document.getElementById('clientAddress').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.setClientAddress(clientAddress);
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            await executeTransaction(contract.setClientAddress, [clientAddress]);
+            console.log('Client address set successfully');
         }
 
+        let totalCost = 0;
+
         async function makeFullPayment() {
-            const clientAddress = document.getElementById('clientAddress').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.makeFullPayment({ value: ethers.utils.parseEther('1') });
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            await executePayableTransaction(contract.makeFullPayment, [], totalCost*105/100);
+            console.log('Payment success');
         }
 
         async function submitArtwork() {
             const artistAddress = document.getElementById('artistAddress').value;
             const ipfsHash = document.getElementById('artworkIpfsHash').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.submitArtwork(ipfsHash);
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            await executeTransaction(contract.submitArtwork, [ipfsHash]);
+            console.log('Artwork submitted successfully');
         }
 
         async function approveArtwork() {
-            const clientAddress = document.getElementById('clientAddress').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.approveArtwork();
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            await executeTransaction(contract.approveArtwork, []);
+            console.log('Artwork approved successfully');
         }
 
         async function cancelContract() {
-            const clientAddress = document.getElementById('clientAddress').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.cancelContract();
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            await executeTransaction(contract.cancelContract, []);
+            console.log('Contract cancelled successfully');
         }
 
         async function requestRevision() {
-            const clientAddress = document.getElementById('clientAddress').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.requestRevision();
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            await executeTransaction(contract.requestRevision, []);
+            console.log('Revision requested successfully');
         }
 
         async function submitRevisedArtwork() {
-            const artistAddress = document.getElementById('artistAddress').value;
-            const ipfsHash = document.getElementById('revisedArtworkIpfsHash').value;
-            const signer = contract.connect(provider.getSigner());
-            const tx = await signer.submitRevisedArtwork(ipfsHash);
-            await tx.wait();
-            console.log('Transaction hash:', tx.hash);
+            const revisedArtworkIpfsHash= document.getElementById('revisedArtworkIpfsHash').value;
+            await executeTransaction(contract.submitRevisedArtwork, [revisedArtworkIpfsHash]);
+            console.log('Revised artwork submitted successfully');
         }
 
         async function setArtistAddress() {
             const artistAddress = document.getElementById('artistAddress').value;
-            await contract.setArtistAddress(artistAddress);
+            await executeTransaction(contract.setArtistAddress, [artistAddress]);
             console.log('Artist address set successfully');
         }
 
         async function setTotalCost() {
-            const totalCost = ethers.utils.parseEther(document.getElementById('totalCost').value);
-            await contract.setTotalCost(totalCost);
+            totalCost = ethers.utils.parseUnits(document.getElementById('totalCost').value, 'wei');
+            await executeTransaction(contract.setTotalCost, [totalCost]);
             console.log('Total cost set successfully');
         }
 
         async function setMaxRevisions() {
             const maxRevisions = document.getElementById('maxRevision').value;
-            await contract.setMaxRevisions(maxRevisions);
-            console.log('Max revisions set successfully');
+            await executeTransaction(contract.setMaxRevisions, [maxRevisions]);
+            console.log('Max revision set successfully');
         }
-
-        // Handle UI interactions
-        document.getElementById('setClientAddressBtn').addEventListener('click', setClientAddress);
-        document.getElementById('makeFullPaymentBtn').addEventListener('click', makeFullPayment);
-        document.getElementById('submitArtworkBtn').addEventListener('click', submitArtwork);
-        document.getElementById('approveArtworkBtn').addEventListener('click', approveArtwork);
-        document.getElementById('cancelContractBtn').addEventListener('click', cancelContract);
-        document.getElementById('requestRevisionBtn').addEventListener('click', requestRevision);
-        document.getElementById('submitRevisedArtworkBtn').addEventListener('click', submitRevisedArtwork);
-        document.getElementById('setArtistAddressBtn').addEventListener('click', setArtistAddress);
-        document.getElementById('setTotalCostBtn').addEventListener('click', setTotalCost);
-        document.getElementById('setMaxRevisionsBtn').addEventListener('click', setMaxRevisions);
-        document.getElementById('cancelContractBtn2').addEventListener('click', cancelContract);
     </script>
 </body>
 </html>
