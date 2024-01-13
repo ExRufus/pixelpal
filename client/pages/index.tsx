@@ -1,21 +1,18 @@
-import { useState, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
+import { Fragment, useState } from "react";
+import ArrowDownIcon from "../components/icons/ArrowDownIcon";
+import ChevronDownIcon from "../components/icons/ChevronDownIcon";
 import SearchIcon from "../components/icons/SearchIcon";
 import StarIcon from "../components/icons/StarIcon";
-import ChevronDownIcon from "../components/icons/ChevronDownIcon";
-import ArrowDownIcon from "../components/icons/ArrowDownIcon";
-import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
-import Link from "next/link";
-import Image from "next/image";
-import { truncateAddress } from "../util/truncateAddress";
-import { Dialog, Transition } from "@headlessui/react";
 import XMarkIcon from "../components/icons/XMarkIcon";
+import { truncateAddress } from "../util/truncateAddress";
 
 export default function TestPage() {
   const address = useAddress();
-  console.log({ address });
   const [dropdown, setDropdown] = useState<"hidden" | "shown">("hidden");
 
-  let [isOpen, setIsOpen] = useState(true);
+  let [isOpen, setIsOpen] = useState(false);
   function closeModal() {
     setIsOpen(false);
   }
